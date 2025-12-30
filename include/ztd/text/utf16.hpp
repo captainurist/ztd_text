@@ -180,6 +180,10 @@ namespace ztd { namespace text {
 							}
 							auto __second_surrogate = __it;
 							++__second_surrogate;
+							// Check bounds before dereferencing __second_surrogate
+							if (__second_surrogate == __last) {
+								break;
+							}
 							if (__ztd_idk_detail_is_trail_surrogate(
 								    static_cast<ztd_char32_t>(*__second_surrogate))) {
 								break;
@@ -315,6 +319,8 @@ namespace ztd { namespace text {
 					}
 				}
 
+				// Advance past lead surrogate BEFORE checking bounds, so we can detect incomplete sequences
+				::ztd::ranges::iter_advance(__in_it);
 				if constexpr (__call_error_handler) {
 					if (__in_it == __in_last) {
 						__self_t __self {};
@@ -322,11 +328,10 @@ namespace ztd { namespace text {
 							_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
 							     _SubOutput(::std::move(__out_it), ::std::move(__out_last)), __s,
 							     encoding_error::incomplete_sequence),
-							::ztd::span<code_unit>(), ::ztd::span<code_point>());
+							::ztd::span<code_unit>(__units.data(), 1), ::ztd::span<code_point>());
 					}
 				}
 
-				::ztd::ranges::iter_advance(__in_it);
 				const char16_t __trail16 = static_cast<char16_t>(*__in_it);
 				__units[1]               = static_cast<code_unit>(__trail16);
 				if constexpr (__surrogates_allowed) {
