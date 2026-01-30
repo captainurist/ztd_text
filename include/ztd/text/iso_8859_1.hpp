@@ -156,7 +156,7 @@ namespace ztd { namespace text {
 			const code_unit& __unit = __units[0];
 
 			if constexpr (__call_error_handler) {
-				if (static_cast<unsigned int>(__unit) > static_cast<unsigned int>(0xFF)) {
+				if (static_cast<unsigned int>(static_cast<unsigned char>(__unit)) > static_cast<unsigned int>(0xFF)) {
 					basic_iso_8859_1 __self {};
 					return ::std::forward<_ErrorHandler>(__error_handler)(__self,
 						_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
@@ -168,7 +168,7 @@ namespace ztd { namespace text {
 
 			::ztd::ranges::iter_advance(__in_it);
 
-			*__out_it = __unit;
+			*__out_it = static_cast<unsigned char>(__unit);
 			::ztd::ranges::iter_advance(__out_it);
 
 			return _Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
