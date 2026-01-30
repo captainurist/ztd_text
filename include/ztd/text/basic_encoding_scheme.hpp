@@ -212,31 +212,6 @@ namespace ztd { namespace text {
 			return this->__base_t::get_value();
 		}
 
-		//////
-		/// @brief Returns, the desired replacement code units to use.
-		///
-		/// @remarks This is only callable if the function call exists on the wrapped encoding. It is broken down
-		/// into a contiguous view type formulated from bytes if the wrapped code unit types do not match.
-		template <typename _Unused                                     = encoding_type,
-			::std::enable_if_t<is_code_units_replaceable_v<_Unused>>* = nullptr>
-		constexpr decltype(auto) replacement_code_units() const noexcept {
-			using _OriginalCodeUnit = code_unit_t<encoding_type>;
-
-			decltype(auto) __original = this->base().replacement_code_units();
-			if constexpr (::std::is_same_v<_OriginalCodeUnit, code_unit>) {
-				return __original;
-			}
-			else {
-				using _OriginalSpan    = ::ztd::span<const _OriginalCodeUnit>;
-				using _TransformedSpan = ::ztd::span<const code_unit>;
-				_OriginalSpan __guaranteed_code_unit_view(__original);
-				// transform into proper type...
-				auto __transformed_ptr = reinterpret_cast<const code_unit*>(__guaranteed_code_unit_view.data());
-				auto __transformed_size
-					= (__guaranteed_code_unit_view.size() * sizeof(_OriginalCodeUnit)) / sizeof(const code_unit);
-				return _TransformedSpan(__transformed_ptr, __transformed_size);
-			}
-		}
 
 		//////
 		/// @brief Returns the desired replacement code points to use.
@@ -249,38 +224,7 @@ namespace ztd { namespace text {
 		}
 
 		//////
-		/// @brief Returns the desired replacement code units to use, or an empty optional-like type if there is
-		/// nothing present.
-		///
-		/// @remarks This is only callable if the function call exists on the wrapped encoding. It is broken down
-		/// into a contiguous view type formulated from bytes if the wrapped code unit types do not match.
-		template <typename _Unused                                           = encoding_type,
-			::std::enable_if_t<is_code_units_maybe_replaceable_v<_Unused>>* = nullptr>
-		constexpr decltype(auto) maybe_replacement_code_units() const noexcept {
-			using _OriginalCodeUnit = code_unit_t<encoding_type>;
-
-			decltype(auto) __maybe_original = this->base().maybe_replacement_code_units();
-			if constexpr (::std::is_same_v<_OriginalCodeUnit, code_unit>) {
-				return __maybe_original;
-			}
-			else {
-				using _OriginalSpan    = ::ztd::span<const _OriginalCodeUnit>;
-				using _TransformedSpan = ::ztd::span<const code_unit>;
-				if (!__maybe_original) {
-					return ::std::optional<_TransformedSpan>(::std::nullopt);
-				}
-				decltype(auto) __original = *__maybe_original;
-				_OriginalSpan __guaranteed_code_unit_view(__original);
-				// transform into proper type...
-				auto __transformed_ptr = reinterpret_cast<const code_unit*>(__guaranteed_code_unit_view.data());
-				auto __transformed_size
-					= (__guaranteed_code_unit_view.size() * sizeof(_OriginalCodeUnit)) / sizeof(const code_unit);
-				return _TransformedSpan(__transformed_ptr, __transformed_size);
-			}
-		}
-
-		//////
-		/// @brief Returns the desired replacement code units to use.
+		/// @brief Returns the desired replacement code points to use.
 		///
 		/// @remarks This Is only callable if the function call exists on the wrapped encoding.
 		template <typename _Unused                                            = encoding_type,
