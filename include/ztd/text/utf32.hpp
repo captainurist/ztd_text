@@ -199,12 +199,13 @@ namespace ztd { namespace text {
 					if (__unit32 > __ztd_idk_detail_last_unicode_code_point
 						|| (!__surrogates_allowed
 						     && __ztd_idk_detail_is_surrogate(static_cast<ztd_char32_t>(__unit)))) {
+						::ztd::ranges::iter_advance(__in_it);
 						__self_t __self {};
 						return ::std::forward<_ErrorHandler>(__error_handler)(__self,
 							_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
 							     _SubOutput(::std::move(__out_it), ::std::move(__out_last)), __s,
 							     encoding_error::invalid_sequence),
-							::ztd::span<code_unit>(), ::ztd::span<code_point>());
+							::ztd::span<code_unit>(::std::addressof(__unit), 1), ::ztd::span<code_point>());
 					}
 				}
 
