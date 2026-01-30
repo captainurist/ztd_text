@@ -150,6 +150,7 @@ namespace ztd { namespace text {
 
 			if constexpr (__call_error_handler) {
 				if (static_cast<signed char>(__unit) < static_cast<signed char>(0)) {
+					::ztd::ranges::iter_advance(__in_it);
 					ascii_t __self {};
 					return ::std::forward<_ErrorHandler>(__error_handler)(__self,
 						_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
