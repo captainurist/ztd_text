@@ -169,7 +169,7 @@ namespace ztd { namespace text {
 					const unsigned char __second_byte_offset = __second_byte < 0x7F ? 0x40 : 0x62;
 					const ::std::size_t __lookup_index
 						= ((__unit0 - 0x81) * 157) + (__second_byte - __second_byte_offset);
-					constexpr auto __serialize_double_byte
+					auto __serialize_double_byte
 						= [&](const std::size_t __double_code_point_values_index) {
 							  if constexpr (__call_error_handler) {
 								  if (__out_it == __out_last) {
@@ -193,10 +193,10 @@ namespace ztd { namespace text {
 									            __state, ztd::text::encoding_error::insufficient_output_space),
 									       ::ztd::span<const code_unit, 1>(::std::addressof(__units[0]), 1),
 									       ::ztd::span<const code_point, 1>(
-									            ::std::addressof(__double_code_point_values[0], 1)));
+									            ::std::addressof(__double_code_point_values[__double_code_point_values_index][1]), 1));
 								  }
 							  }
-							  *__out_it = __double_code_point_values[__double_code_point_values_index][0];
+							  *__out_it = __double_code_point_values[__double_code_point_values_index][1];
 							  ++__in_it;
 							  ++__out_it;
 							  return _Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
@@ -228,7 +228,7 @@ namespace ztd { namespace text {
 									     ztd::text::encoding_error::insufficient_output_space),
 									::ztd::span<const code_unit, 1>(::std::addressof(__units[0]), 1),
 									::ztd::span<const code_point, 1>(
-									     ::std::addressof(__double_code_point_values[0]), 1));
+									     ::std::addressof(__double_code_point_values[0][0]), 1));
 							}
 						}
 						const code_point __code_point = static_cast<code_point>(*__maybe_code);

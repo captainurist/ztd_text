@@ -97,13 +97,13 @@ namespace ztd { namespace text {
 			constexpr ztd::span<const code_point, 1> replacement_code_points() const noexcept {
 				if constexpr (_IsGbk) {
 					return ztd::span<const code_point, 1>(
-						__txt_detail::__question_mark_replacement_units<code_unit>.data(),
-						__txt_detail::__question_mark_replacement_units<code_unit>.size());
+						__txt_detail::__question_mark_replacement_units<code_point>.data(),
+						__txt_detail::__question_mark_replacement_units<code_point>.size());
 				}
 				else {
-					return ztd::span<const code_point, 4>(
-						__txt_detail::__0xfffd_gb18030_replacement_units<code_unit>.data(),
-						__txt_detail::__0xfffd_gb18030_replacement_units<code_unit>.size());
+					return ztd::span<const code_point, 1>(
+						__txt_detail::__0xfffd_replacement_units<code_point>.data(),
+						__txt_detail::__0xfffd_replacement_units<code_point>.size());
 				}
 			}
 
