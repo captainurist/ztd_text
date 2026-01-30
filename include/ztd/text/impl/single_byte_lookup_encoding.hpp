@@ -166,7 +166,7 @@ namespace ztd { namespace text {
 								::ztd::span<const code_point, 0>(), ::ztd::span<const code_unit, 0>());
 						}
 					}
-					const code_unit __code_unit = static_cast<code_unit>(*__maybe_index + 0x80);
+					const code_unit __code_unit = static_cast<code_unit>(*__maybe_index);
 					*__out_it                   = __code_unit;
 					++__in_it;
 					++__out_it;
