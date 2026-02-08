@@ -44,6 +44,7 @@
 
 #include <ztd/idk/unwrap.hpp>
 
+#include <array>
 #include <optional>
 #include <cstddef>
 
@@ -76,6 +77,36 @@ namespace ztd { namespace text {
 		using __base_t       = ebco<_Encoding>;
 		using _UBaseEncoding = unwrap_remove_cvref_t<_Encoding>;
 		using _BaseCodeUnit  = code_unit_t<_UBaseEncoding>;
+
+		template <typename _Enc, bool _BigEndian>
+		struct __replacement_bytes_holder {
+			using _BCU = code_unit_t<_Enc>;
+			static constexpr ::std::size_t _ByteCount
+				= _Enc::replacement_code_units().size() * sizeof(_BCU);
+
+			static constexpr ::std::array<_Byte, _ByteCount> _S_compute() noexcept {
+				::std::array<_Byte, _ByteCount> __s {};
+				auto __src = _Enc::replacement_code_units();
+				::std::size_t __pos = 0;
+				for (::std::size_t __i = 0; __i < __src.size(); ++__i) {
+					using _UCU = ::std::make_unsigned_t<_BCU>;
+					_UCU __val = static_cast<_UCU>(__src[__i]);
+					for (::std::size_t __j = 0; __j < sizeof(_BCU); ++__j) {
+						if constexpr (_BigEndian) {
+							__s[__pos++] = static_cast<_Byte>(
+								(__val >> (8 * (sizeof(_BCU) - 1 - __j))) & 0xFF);
+						}
+						else {
+							__s[__pos++] = static_cast<_Byte>(
+								(__val >> (8 * __j)) & 0xFF);
+						}
+					}
+				}
+				return __s;
+			}
+
+			static constexpr ::std::array<_Byte, _ByteCount> value = _S_compute();
+		};
 
 	public:
 		//////
@@ -212,6 +243,27 @@ namespace ztd { namespace text {
 			return this->__base_t::get_value();
 		}
 
+
+		//////
+		/// @brief Returns the desired replacement code units to use.
+		///
+		/// @remarks This is only callable if the function call exists on the wrapped encoding. The code units
+		/// are converted to the byte representation with the correct endianness.
+		template <typename _Unused                                     = encoding_type,
+			::std::enable_if_t<is_code_units_replaceable_v<_Unused>>* = nullptr>
+		constexpr auto replacement_code_units() const noexcept {
+			using _OriginalCodeUnit = code_unit_t<encoding_type>;
+			if constexpr (::std::is_same_v<_OriginalCodeUnit, code_unit>) {
+				return this->base().replacement_code_units();
+			}
+			else {
+				constexpr bool __is_big = (_Endian == endian::big)
+					|| (_Endian == endian::native && endian::native == endian::big);
+				constexpr auto& __b
+					= __replacement_bytes_holder<_UBaseEncoding, __is_big>::value;
+				return ::ztd::span<const code_unit>(__b.data(), __b.size());
+			}
+		}
 
 		//////
 		/// @brief Returns the desired replacement code points to use.
