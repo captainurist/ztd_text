@@ -151,17 +151,18 @@ namespace ztd { namespace text {
 			}
 			else if ((__unit0 <= 0xFE && __unit0 >= 0x81)) {
 				// Top-Level case 1: this is a double-byte sequence!
+				++__in_it;
 				if constexpr (__call_error_handler) {
 					if (__in_it == __in_last) {
 						basic_big5_hkscs __self {};
 						return ::std::forward<_ErrorHandler>(__error_handler)(__self,
-							_Result(::std::move(__input), ::std::move(__output), __state,
+							_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
+							     ::std::move(__output), __state,
 							     ztd::text::encoding_error::incomplete_sequence),
 							::ztd::span<const code_unit, 1>(::std::addressof(__units[0]), 1),
 							::ztd::span<const code_point, 0>());
 					}
 				}
-				++__in_it;
 				__units[1]                  = static_cast<code_unit>(*__in_it);
 				unsigned char __second_byte = static_cast<unsigned char>(__units[1]);
 				if ((__second_byte <= 0x7E && __second_byte >= 0x40)

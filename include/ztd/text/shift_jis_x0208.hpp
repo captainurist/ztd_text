@@ -174,17 +174,18 @@ namespace ztd { namespace text {
 			}
 			else if ((__unit0 <= 0x9F && __unit0 >= 0x81) || (__unit0 <= 0xFC && __unit0 >= 0xE0)) {
 				// Top-Level case 2: this is a double-byte sequence!
+				++__in_it;
 				if constexpr (__call_error_handler) {
 					if (__in_it == __in_last) {
 						basic_shift_jis_x0208 __self {};
 						return ::std::forward<_ErrorHandler>(__error_handler)(__self,
-							_Result(::std::move(__input), ::std::move(__output), __state,
+							_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
+							     ::std::move(__output), __state,
 							     ztd::text::encoding_error::incomplete_sequence),
 							::ztd::span<const code_unit, 1>(::std::addressof(__units[0]), 1),
 							::ztd::span<const code_point, 0>());
 					}
 				}
-				++__in_it;
 				__units[1]                         = static_cast<code_unit>(*__in_it);
 				unsigned char __second_byte        = static_cast<unsigned char>(__units[1]);
 				unsigned char __lookup_offset      = __second_byte < 0x7F ? 0x40 : 0x41;

@@ -206,18 +206,19 @@ namespace ztd { namespace text {
 				}
 				else if ((__unit0 >= 0x81 && __unit0 <= 0xFE)) {
 					// Top-Level case 2: this is a double-byte sequence!
+					++__in_it;
+					++__read_units;
 					if constexpr (__call_error_handler) {
 						if (__in_it == __in_last) {
 							_Derived __self {};
 							return ::std::forward<_ErrorHandler>(__error_handler)(__self,
-								_Result(::std::move(__input), ::std::move(__output), __state,
+								_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
+								     ::std::move(__output), __state,
 								     ztd::text::encoding_error::incomplete_sequence),
 								::ztd::span<const code_unit, 1>(::std::addressof(__units[0]), 1),
 								::ztd::span<const code_point, 0>());
 						}
 					}
-					++__in_it;
-					++__read_units;
 					__units[1]                        = static_cast<code_unit>(*__in_it);
 					const unsigned char __second_byte = static_cast<unsigned char>(__units[1]);
 
@@ -236,7 +237,7 @@ namespace ztd { namespace text {
 										_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
 										     _SubOutput(::std::move(__out_it), ::std::move(__out_last)),
 										     __state, ztd::text::encoding_error::insufficient_output_space),
-										::ztd::span<const code_unit, 3>(
+										::ztd::span<const code_unit>(
 										     ::std::addressof(__units[0]), __read_units),
 										::ztd::span<const code_point, 0>());
 								}
@@ -267,44 +268,38 @@ namespace ztd { namespace text {
 								// 2 bytes!
 								_Derived __self {};
 								return ::std::forward<_ErrorHandler>(__error_handler)(__self,
-									_Result(::std::move(__input), ::std::move(__output), __state,
+									_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
+									     ::std::move(__output), __state,
 									     ztd::text::encoding_error::invalid_sequence),
-									::ztd::span<const code_unit, 2>(
+									::ztd::span<const code_unit, 1>(
 									     ::std::addressof(__units[0]), __read_units),
 									::ztd::span<const code_point, 0>());
 							}
 						}
 						else {
+							++__in_it;
+							++__read_units;
 							if constexpr (__call_error_handler) {
 								if (__in_it == __in_last) {
 									_Derived __self {};
 									return ::std::forward<_ErrorHandler>(__error_handler)(__self,
-										_Result(::std::move(__input), ::std::move(__output), __state,
+										_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
+										     ::std::move(__output), __state,
 										     ztd::text::encoding_error::incomplete_sequence),
 										::ztd::span<const code_unit, 2>(
 										     ::std::addressof(__units[0]), __read_units),
 										::ztd::span<const code_point, 0>());
 								}
 							}
-							++__in_it;
-							++__read_units;
 							__units[2]                       = static_cast<code_unit>(*__in_it);
 							const unsigned char __third_byte = static_cast<unsigned char>(__units[2]);
 							if constexpr (__call_error_handler) {
 								if (__third_byte < 0x81 || __third_byte > 0xFE) {
 									_Derived __self {};
 									return ::std::forward<_ErrorHandler>(__error_handler)(__self,
-										_Result(::std::move(__input), ::std::move(__output), __state,
+										_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
+										     ::std::move(__output), __state,
 										     ztd::text::encoding_error::invalid_sequence),
-										::ztd::span<const code_unit, 2>(
-										     ::std::addressof(__units[0]), __read_units),
-										::ztd::span<const code_point, 0>());
-								}
-								if (__in_it == __in_last) {
-									_Derived __self {};
-									return ::std::forward<_ErrorHandler>(__error_handler)(__self,
-										_Result(::std::move(__input), ::std::move(__output), __state,
-										     ztd::text::encoding_error::incomplete_sequence),
 										::ztd::span<const code_unit, 2>(
 										     ::std::addressof(__units[0]), __read_units),
 										::ztd::span<const code_point, 0>());
@@ -313,13 +308,26 @@ namespace ztd { namespace text {
 
 							++__in_it;
 							++__read_units;
+							if constexpr (__call_error_handler) {
+								if (__in_it == __in_last) {
+									_Derived __self {};
+									return ::std::forward<_ErrorHandler>(__error_handler)(__self,
+										_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
+										     ::std::move(__output), __state,
+										     ztd::text::encoding_error::incomplete_sequence),
+										::ztd::span<const code_unit, 3>(
+										     ::std::addressof(__units[0]), __read_units),
+										::ztd::span<const code_point, 0>());
+								}
+							}
 							__units[3]                        = static_cast<code_unit>(*__in_it);
 							const unsigned char __fourth_byte = static_cast<unsigned char>(__units[3]);
 							if constexpr (__call_error_handler) {
 								if (__fourth_byte < 0x30 || __fourth_byte > 0x39) {
 									_Derived __self {};
 									return ::std::forward<_ErrorHandler>(__error_handler)(__self,
-										_Result(::std::move(__input), ::std::move(__output), __state,
+										_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
+										     ::std::move(__output), __state,
 										     ztd::text::encoding_error::invalid_sequence),
 										::ztd::span<const code_unit, 3>(
 										     ::std::addressof(__units[0]), __read_units),
