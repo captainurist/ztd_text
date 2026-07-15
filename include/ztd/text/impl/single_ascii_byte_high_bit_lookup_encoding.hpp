@@ -146,6 +146,7 @@ namespace ztd { namespace text {
 					}
 				}
 
+				++__in_it;
 				_Derived __self {};
 				return ::std::forward<_ErrorHandler>(__error_handler)(__self,
 					_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
