@@ -451,6 +451,7 @@ namespace ztd { namespace text {
 								= __ztd_idk_detail_mutf8_is_invalid(static_cast<uchar8_t>(__unit0));
 							if (__is_invalid_cu
 								|| !__ztd_idk_detail_is_lead_utf8(static_cast<uchar8_t>(__unit0))) {
+								::ztd::ranges::iter_advance(__in_it);
 								__self_t __self {};
 								return ::std::forward<_ErrorHandler>(__error_handler)(__self,
 									_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
@@ -464,6 +465,7 @@ namespace ztd { namespace text {
 						const bool __is_invalid_cu
 							= __ztd_idk_detail_utf8_is_invalid(static_cast<uchar8_t>(__unit0));
 						if (__is_invalid_cu || !__ztd_idk_detail_is_lead_utf8(static_cast<uchar8_t>(__unit0))) {
+							::ztd::ranges::iter_advance(__in_it);
 							__self_t __self {};
 							return ::std::forward<_ErrorHandler>(__error_handler)(__self,
 								_Result(_SubInput(::std::move(__in_it), ::std::move(__in_last)),
